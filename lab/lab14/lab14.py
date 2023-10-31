@@ -54,31 +54,31 @@ def align_skeleton(skeleton, code):
             cost: the cost of the corrections, in edits
         """
         if skeleton_idx == len(skeleton) and code_idx == len(code):
-            return _________, ______________
+            return '', 0
         if skeleton_idx < len(skeleton) and code_idx == len(code):
             edits = "".join(["-[" + c + "]" for c in skeleton[skeleton_idx:]])
-            return _________, ______________
+            return edits, len(skeleton) - skeleton_idx
         if skeleton_idx == len(skeleton) and code_idx < len(code):
             edits = "".join(["+[" + c + "]" for c in code[code_idx:]])
-            return _________, ______________
+            return edits, len(code) - code_idx
         
         possibilities = []
         skel_char, code_char = skeleton[skeleton_idx], code[code_idx]
         # Match
         if skel_char == code_char:
-            _________________________________________
-            _________________________________________
-            possibilities.append((_______, ______))
+            match1, cost1 = helper_align(skeleton_idx + 1, code_idx + 1)
+            match1 = skel_char + match1
+            possibilities.append((match1, cost1))
         # Insert
-        _________________________________________
-        _________________________________________
-        possibilities.append((_______, ______))
+        match2, cost2 = helper_align(skeleton_idx, code_idx + 1)
+        match2 = "".join(["+[" + code_char + "]"]) + match2
+        possibilities.append((match2, cost2 + 1))
         # Delete
-        _________________________________________
-        _________________________________________
-        possibilities.append((_______, ______))
+        match3, cost3 = helper_align(skeleton_idx + 1, code_idx)
+        match3 = "".join(["-[" + skel_char + "]"]) + match3
+        possibilities.append((match3, cost3 + 1))
         return min(possibilities, key=lambda x: x[1])
-    result, cost = ________________________
+    result, cost = helper_align(0, 0)
     return result
 
 
@@ -96,6 +96,20 @@ def num_splits(s, d):
     12
     """
     "*** YOUR CODE HERE ***"
+    length = len(s)
+    total = 0 # store the number of possibilities
+    # Although this is a partition of lists, we don't need to keep track of sublists
+    # Instead we only need to keep track of two sums and compare them
+    def split_helper(first, second, index):
+        nonlocal total
+        if index == length:
+            if abs(first - second) <= d:
+                total += 1
+            return
+        split_helper(first + s[index], second, index + 1)
+        split_helper(first, second + s[index], index + 1)
+    split_helper(0, 0, 0)
+    return total // 2
 
 
 def insert(link, value, index):
@@ -113,14 +127,16 @@ def insert(link, value, index):
     >>> insert(link, 4, 5)
     IndexError
     """
-    if ____________________:
-        ____________________
-        ____________________
-        ____________________
-    elif ____________________:
-        ____________________
+    if index == 0:
+        temp = Link(link.first, link.rest)
+        link.first = value
+        # If I wrote "link = Link(value)", then the reference "link" in the local frame will be changed
+        # But the original referenced object will not be affected
+        link.rest = temp
+    elif link.rest is Link.empty:
+        raise IndexError
     else:
-        ____________________
+        insert(link.rest, value, index - 1)
 
 
 

@@ -10,8 +10,9 @@
 
 
 (define-macro (switch expr cases)
-	(cons _________
-		(map (_________ (_________) (cons _________ (cdr case)))
-    			cases))
-)
-
+	(cons 'cond
+		(map (lambda (case) (cons (eq? (eval expr) (car case)) (cdr case)))
+    			cases)))
+'Note-that-the-cond-is-quoted-while-map,-lambda,-eq?-are-not
+'This-is-because-cond-is-not-executed-until-macro-is-called
+'But-the-other-ones-are-executed-when-macro-is-initiated
